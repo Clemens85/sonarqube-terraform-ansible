@@ -1,0 +1,4 @@
+.idea/
+
+/provision/sonar.properties
+/**/.terraform/

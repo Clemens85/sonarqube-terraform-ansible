@@ -1,0 +1,65 @@
+---
+
+- name: install nginx
+  apt:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      - nginx
+  tags: nginx
+  
+- name: enable service nginx
+  systemd:
+    name: nginx
+    enabled: yes
+  tags: nginx
+  
+- name: Ensure prt 80 and 443 are not blocked by firewall
+  shell: ufw allow 80,443/tcp
+  tags: nginx
+  
+# The following depends on current used nginx version / distribution:
+# If not sites-available / sites-enabled exist, we would just overwrite the default config from nginx which is placed in  /etc/nginx/conf.d/default.conf
+# Otherwise we use sites-enabled / sites-available mechanism and copy/link our config
+  
+- name: check default conf in sites-available exists
+  stat:
+    path: /etc/nginx/sites-available/default
+  register: sites_available_default
+  
+- name: copy nginx.conf
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/conf.d/default.conf
+  when: not sites_available_default.stat.exists
+  tags: nginx
+
+- name: copy nginx.conf
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/sites-available/sonarqube
+  when: sites_available_default.stat.exists
+  tags: nginx
+  
+- name: delete link to default nginx conf
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  when: sites_available_default.stat.exists
+  tags: nginx
+
+- name: link SonarQube nginx.conf
+  file:
+    src: /etc/nginx/sites-available/sonarqube
+    dest: /etc/nginx/sites-enabled/default
+    state: link
+  when: sites_available_default.stat.exists
+  tags: nginx
+  
+  
+#- name: ufw - allow HTTP and HTTPS connections
+#  ufw:
+#    rule: allow
+#    name: nginx full
+#  tags: nginx

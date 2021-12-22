@@ -1,0 +1,21 @@
+[Unit]
+Description=SonarQube service
+After=syslog.target network.target
+
+[Service]
+Type=simple
+User=sonarqube
+Group=sonarqube
+PermissionsStartOnly=true
+
+ExecStartPre=+/bin/sh -c '/opt/sonarqube/fetch-and-replace-db-password.sh'
+ExecStart=/bin/nohup java -Xms128m -Xmx2048m -Djava.net.preferIPv4Stack=true -jar /opt/sonarqube/lib/sonar-application-{{ sonarqube_version }}.jar
+StandardOutput=syslog
+LimitNOFILE=131072
+LimitNPROC=8192
+TimeoutStartSec=5
+Restart=always
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target

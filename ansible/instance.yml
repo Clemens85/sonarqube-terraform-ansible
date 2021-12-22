@@ -1,0 +1,54 @@
+- hosts: sonarqube_vm
+  remote_user: sonarqube-admin
+  become: yes
+
+  roles:
+
+    - role: base
+
+    - role: jnv.unattended-upgrades
+
+    - role: sonarqube
+
+    - role: nginx
+
+    - role: azuredns.secrets
+    
+    - role: nickjj.acme_sh
+      tags: [acme_sh]
+      vars:
+        acme_sh_account_email: "{{ dns_email }}"
+        acme_sh_default_dns_provider: "dns_azure"
+        acme_sh_git_version: "3.0.1"
+        acme_sh_default_install_cert_reloadcmd: "service nginx force-reload"
+        acme_sh_default_extra_flags_issue: "--server letsencrypt"
+        acme_sh_default_force_issue: "{{ dns_force_issue }}"
+        acme_sh_domains:
+          - domains: [ "{{ dns_name }}" ]
+            staging: False
+        acme_sh_default_dns_provider_api_keys:
+          AZUREDNS_TENANTID: "{{ AZUREDNS_TENANTID.stdout }}"
+          AZUREDNS_APPID: "{{ AZUREDNS_APPID.stdout }}"
+          AZUREDNS_CLIENTSECRET: "{{ AZUREDNS_CLIENTSECRET.stdout }}"
+          AZUREDNS_SUBSCRIPTIONID: "{{ dns_subscription_id }}"
+          
+  tasks:
+    - name: restart nginx in any case at end of playbook
+      service:
+        name: nginx
+        state: restarted
+          
+  vars:
+    key_vault_name:
+    db_secret_name:
+    db_name:
+    db_server:
+    db_url: "jdbc:postgresql://{{ db_server }}:5432/{{ db_name }}"
+    db_user: "sonarqube@{{ db_name }}"
+    sonarqube_user: sonarqube
+    # sonarqube_version: "9.2.0.49834"
+    sonarqube_version: "9.2.3.50713"
+    dns_name:
+    dns_email:
+    dns_subscription_id:
+    dns_force_issue: False

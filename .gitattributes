@@ -1,0 +1,7 @@
+*.sh text eol=lf
+*.tf text eol=lf
+*.tfvars text eol=lf
+*.yml text eol=lf
+*.j2 text eol=lf
+*.properties text eol=lf
+*.cfg text eol=lf

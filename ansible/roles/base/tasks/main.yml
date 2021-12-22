@@ -1,0 +1,53 @@
+---
+
+- name: apt update
+  apt:
+    update_cache: yes
+    cache_valid_time: 0
+  tags: base
+
+- name: apt upgrade
+  apt:
+    update_cache: yes
+    autoremove: yes
+    force: yes
+    install_recommends: yes
+    upgrade: dist
+  tags: base
+
+- name: install common packages 
+  apt:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      - zip
+      - unzip
+      - nano
+      - curl
+      - ca-certificates
+      - apt-transport-https
+      - lsb-release 
+      - gnupg
+      - git
+      - openjdk-11-jre
+  tags: base
+
+- name: Import the APT repo key for Azure CLIL
+  apt_key:
+    url: https://packages.microsoft.com/keys/microsoft.asc
+    keyring: /etc/apt/trusted.gpg.d/microsoft.gpg
+    state: present
+  tags: azcli
+  
+- name: Add the APT repository for Azure CLI
+  apt_repository:
+    repo: "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ {{ansible_distribution_release}} main" 
+    state: present
+
+- name: Install Azure CLI
+  apt:
+    name: azure-cli
+    update_cache: yes
+  tags: azcli
+

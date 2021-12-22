@@ -1,0 +1,21 @@
+server {
+
+  listen 80;
+  listen 443 ssl;
+
+  server_name {{ dns_name }};
+
+  client_max_body_size 32m;
+
+  ssl_certificate /etc/ssl/ansible/{{ dns_name }}.pem;
+  ssl_certificate_key /etc/ssl/ansible/{{ dns_name }}.key;
+  
+  add_header Strict-Transport-Security "max-age=31536000" always;
+
+  ssl_session_cache shared:SSL:10m;
+  ssl_session_timeout 60m;
+
+  location / {
+    proxy_pass http://localhost:9000;
+  }
+}

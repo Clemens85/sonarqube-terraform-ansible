@@ -1,0 +1,104 @@
+---
+
+- name: create sonarqube user
+  user:
+    name: "{{ sonarqube_user }}"
+    state: present
+    system: yes
+    shell: /bin/bash
+
+- name: create folder for sonarqube installation
+  file:
+    path: /opt/sonarqube
+    state: directory
+    owner: "{{ sonarqube_user }}"
+    group: "{{ sonarqube_user }}"
+    mode: 0775
+  tags: sonarqube
+
+- name: check specific sonar application version already there
+  stat:
+    path: /opt/sonarqube/lib/sonar-application-{{ sonarqube_version }}.jar
+  register: sonarqube_app_jar
+  
+- name: check sonar community plugin exists already
+  stat:
+    path: /opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.9.0.jar
+  register: sonarqube_community_plugin
+
+- name: check sonar aad plugin exists already
+  stat:
+    path: /opt/sonarqube/extensions/plugins/sonar-auth-aad-plugin-1.2.0.jar
+  register: sonarqube_aad_plugin
+
+- name: download and extract SonarQube
+  ansible.builtin.unarchive:
+    src: "https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-{{ sonarqube_version }}.zip"
+    dest: /tmp
+    remote_src: yes
+    group: "{{ sonarqube_user }}"
+    mode: 0775
+    owner: "{{ sonarqube_user }}"
+  tags: sonarqube
+  when: not sonarqube_app_jar.stat.exists
+  
+- name: remove existing items in SonarQube folder if new version is gonna being installed
+  shell: rm -rf /opt/sonarqube/*
+  when: not sonarqube_app_jar.stat.exists
+  
+- name: move contents of SonarQube to /opt/sonarqube
+  shell: mv -v /tmp/sonarqube-{{ sonarqube_version }}/* /opt/sonarqube
+  when: not sonarqube_app_jar.stat.exists
+
+- name: download SonarQube Community Plugin
+  get_url:
+    url: https://github.com/mc1arke/sonarqube-community-branch-plugin/releases/download/1.9.0/sonarqube-community-branch-plugin-1.9.0.jar
+    dest: /opt/sonarqube/extensions/plugins
+    mode: 0775
+    group: "{{ sonarqube_user }}"
+    owner: "{{ sonarqube_user }}"
+  tags: sonarqube
+  when: not sonarqube_community_plugin.stat.exists
+
+- name: download SonarQube AAD Plugin
+  get_url:
+    url: https://github.com/hkamel/sonar-auth-aad/releases/download/1.2.0/sonar-auth-aad-plugin-1.2.0.jar
+    dest: /opt/sonarqube/extensions/plugins
+    mode: 0775
+    group: "{{ sonarqube_user }}"
+    owner: "{{ sonarqube_user }}"
+  tags: sonarqube
+  when: not sonarqube_aad_plugin.stat.exists
+
+- name: copy script for fetching and replacing DB password on SonarQube Startup
+  template:
+    src: fetch-and-replace-db-password.sh.j2
+    dest: /opt/sonarqube/fetch-and-replace-db-password.sh
+    mode: 0755
+  tags: sonarqube
+
+- name: copy sonar.properties
+  template:
+    src: sonar.properties.j2
+    dest: /opt/sonarqube/conf/sonar.properties
+    owner: "{{ sonarqube_user }}"
+    group: "{{ sonarqube_user }}"
+    mode: 0775
+  tags: sonarqube
+
+- name: configure SonarQube as service
+  template:
+    src: sonarqube.service.j2
+    dest: /etc/systemd/system/sonarqube.service
+  tags: sonarqube
+  
+  # May be needed if above service config is changed before restarting the service again:
+- name: Force systemd daemon reload
+  systemd:
+    daemon_reload: yes
+
+- name: start SonarQube service
+  become: true
+  service:
+    name: sonarqube
+    state: restarted

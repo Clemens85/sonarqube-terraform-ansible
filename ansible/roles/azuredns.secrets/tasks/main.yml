@@ -1,0 +1,24 @@
+---
+
+- name: Login to Azure CLI
+  shell: az login --identity --allow-no-subscriptions
+  tags: acme_sh
+  
+- name: Get AZUREDNS_TENANTID
+  shell: az keyvault secret show --vault-name "{{ key_vault_name }}" --name "AZUREDNS-TENANTID" --query "value" --output tsv
+  register: AZUREDNS_TENANTID
+  tags: acme_sh
+  
+- name: Get AZUREDNS_APPID
+  shell: az keyvault secret show --vault-name "{{ key_vault_name }}" --name "AZUREDNS-APPID" --query "value" --output tsv
+  register: AZUREDNS_APPID
+  tags: acme_sh
+  
+- name: Get AZUREDNS_CLIENTSECRET
+  shell: az keyvault secret show --vault-name "{{ key_vault_name }}" --name "AZUREDNS-CLIENTSECRET" --query "value" --output tsv
+  register: AZUREDNS_CLIENTSECRET
+  tags: acme_sh
+  
+- name: Logout from Azure CLI
+  shell: az logout
+  tags: acme_sh
