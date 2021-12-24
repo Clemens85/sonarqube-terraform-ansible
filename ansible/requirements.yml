@@ -1,7 +1,4 @@
 ---
 
 - name: "jnv.unattended-upgrades"
-  path: roles
-
 - name: "nickjj.acme_sh"
-  path: roles
