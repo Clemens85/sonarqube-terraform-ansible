@@ -11,8 +11,6 @@ STAGE=$1
 setupValidEnvironmentVars "${STAGE}"
 ensureLoggedIn 
 
-# source ./scripts/provide-db-secret.sh
-
 TF_CONFIG_DIR=$2
 if [[ ! -d "./${TF_CONFIG_DIR}" ]]; then
     echo "The config '${TF_CONFIG_DIR}' doesn't exist"

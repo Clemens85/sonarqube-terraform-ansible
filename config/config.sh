@@ -32,14 +32,13 @@ setupValidEnvironmentVars () {
   fi
   
   subscriptionId=$(grep subscription_id "${configDir}/stages/${passedStage}/default.tfvars" | awk -F= '{print $2}' | tr -d '"' | xargs)
-  export TF_VAR_stage="$passedStage"
   export TF_VAR_subscription_id="$subscriptionId"
   
-  export TF_BACKEND_RG_NAME="sonarqube_tf_backend_rg_${TF_VAR_stage}"
-  export TF_BACKEND_STORAGE_NAME="sonartfbackend${TF_VAR_stage}"
-  export TF_BACKEND_STORAGE_CONTAINER_NAME="sonartfbackend${TF_VAR_stage}"
+  export TF_BACKEND_RG_NAME="sonarqube_tf_backend_rg_${passedStage}"
+  export TF_BACKEND_STORAGE_NAME="sonartfbackend${passedStage}"
+  export TF_BACKEND_STORAGE_CONTAINER_NAME="sonartfbackend${passedStage}"
   
-  export TF_VAR_keyvault_rg_name="sonarqube_keyvault_rg_${TF_VAR_stage}"
-  export TF_VAR_keyvault_name="sonar-keyvault-${TF_VAR_stage}"
-  export TF_VAR_keyvault_db_password_secret_name="sonar-db-password-${TF_VAR_stage}"
+  export TF_VAR_keyvault_rg_name="sonarqube_keyvault_rg_${passedStage}"
+  export TF_VAR_keyvault_name="sonar-keyvault-${passedStage}"
+  export TF_VAR_keyvault_db_password_secret_name="sonar-db-password-${passedStage}"
 }
