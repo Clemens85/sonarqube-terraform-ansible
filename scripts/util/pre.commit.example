@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo "Starting Git Precommit Hook"
+powershell -ExecutionPolicy RemoteSigned -Command ./scripts/util/pre-commit.ps1

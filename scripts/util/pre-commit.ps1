@@ -1,5 +1,8 @@
 #!/usr/bin/env pwsh
 
+# For activating this pre-commit script it must be referenced in your .git/pre.commit file (must probably be created)
+# An example pre.commit file exist here, so for easy setup, just execute "cp pre.commit.example .git/pre.commit"
+
 Write-Output "Add execute permission bits to all script files"
 
 $tmpFileName = "precommit-script-files.txt"
