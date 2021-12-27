@@ -12,7 +12,8 @@ ensureLoggedIn
 
 ../scripts/util/allow-ssh-access.sh "$STAGE"
 
-# Workaround when running in WSL (works also on Linux), we just write the ansible.cfg every time in our home dir which was appropriate permissions and set this for usage in ANSIBLE_CONFIG
+# Workaround when running in WSL (works also on Linux), we just write the ansible.cfg every time in our home dir 
+# which has appropriate permissions and set this cfg file to be used by setting the ANSIBLE_CONFIG variable
 # See also https://docs.ansible.com/ansible/devel/reference_appendices/config.html#cfg-in-world-writable-dir
 mkdir -p ~/ansible-sonarqube-config
 cat << EOF > ~/ansible-sonarqube-config/ansible.cfg
@@ -28,7 +29,7 @@ export ANSIBLE_CONFIG="$HOME/ansible-sonarqube-config/ansible.cfg"
 DB_SERVER=$(../terraform/tf.sh "$STAGE" storage output -raw db_server)
 DB_NAME=$(../terraform/tf.sh "$STAGE" storage output -raw name)
 DNS_NAME=$(../terraform/tf.sh "$STAGE" app output -raw dns_record)
-if [[ $DNS_NAME == *. ]]; then # The DNS record result ends typically with a "." (example: "mydomain.de.") => Hence we remove this last ".":
+if [[ $DNS_NAME == *. ]]; then # The DNS record result ends typically with a dot (example: "mydomain.de.") => Hence we remove this last ".":
   DNS_NAME=${DNS_NAME::-1}
 fi
 
