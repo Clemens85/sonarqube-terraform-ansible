@@ -1,3 +1,7 @@
+Complete code for article that can be found on https://medium.com/@clemensstich/setup-sonarqube-by-means-of-infrastructure-as-code-or-why-infrastructure-automation-is-so-hard-3c3862c3ad7. 
+
+Is not meant to be used like a generic "module" that can just be executed anywhere, but can be used as a starting point for own adaptions.
+
 # 1. Configurations
 
 Edit `config/config.sh` and adapt the following variables:
