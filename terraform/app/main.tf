@@ -59,7 +59,7 @@ resource "azurerm_public_ip" "sonarqube" {
   resource_group_name = azurerm_resource_group.sonarqube_app.name
   location            = azurerm_resource_group.sonarqube_app.location
   allocation_method   = "Dynamic"
-  domain_name_label = "mysonarqube"
+  domain_name_label = "mysonarqube-${var.stage}"
   tags = local.common_tags
 }
 

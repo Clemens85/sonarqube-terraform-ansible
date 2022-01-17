@@ -77,8 +77,8 @@ whereas stage is something like e.g. 'dev' or 'prod'.
 
 Initialize terraform backend / state:
 ```shell
-terraform/tf.sh init sandbox storage
-terraform/tf.sh init sandbox app
+terraform/tf.sh sandbox storage init
+terraform/tf.sh sandbox app init
 ```
 
 Needs only to be executed the very first time when starting to work with Terraform on your local machine.
@@ -89,10 +89,10 @@ Execute Terraform commands and append the stage and the area (like storage or ap
 
 Examples:
 ``` shell
-terraform/tf.sh plan sandbox storage
-terraform/tf.sh apply sandbox storage
-terraform/tf.sh plan sandbox app
-terraform/tf.sh apply sandbox app
+terraform/tf.sh sandbox storage plan
+terraform/tf.sh sandbox storage apply
+terraform/tf.sh sandbox app plan
+terraform/tf.sh sandbox app apply
 ...
 ```
 
